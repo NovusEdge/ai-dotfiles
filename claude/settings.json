@@ -134,16 +134,6 @@
             "timeout": 5
           }
         ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"/home/novusedge/.claude/hooks/engrammic-post-commit-nudge.sh\"",
-            "timeout": 5
-          }
-        ]
       }
     ],
     "PreToolUse": [
@@ -228,7 +218,6 @@
     "frontend-design@claude-code-plugins": false,
     "frontend-design@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": false,
-    "greptile@claude-plugins-official": false,
     "impeccable@impeccable": false,
     "ponytail@ponytail": true,
     "rust-analyzer-lsp@claude-plugins-official": false,
@@ -257,11 +246,5 @@
   "autoCompactEnabled": true,
   "teammateMode": "auto",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "mcpServers": {
-    "engrammic": {
-      "type": "http",
-      "url": "https://beta.engrammic.ai/mcp/"
-    }
-  }
+  "agentPushNotifEnabled": true
 }

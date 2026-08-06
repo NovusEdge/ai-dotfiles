@@ -24,9 +24,49 @@ Scan every draft for this before sending. Catch one after sending and you fix it
      forms of this section. It blocks the turn on high-confidence matches and
      warns on ambiguous ones. Code fences and inline code spans are exempt. -->
 
+## Banned vocabulary
+
+These words have been used so hard by LLMs that a reader clocks the text as
+machine-written on sight. They are banned in my prose, in code comments, in
+commit messages, in PR bodies. Reach for the ordinary word.
+
+**Load-bearing.** The single worst one. Say what actually depends on it.
+
+**Puffed-up verbs and adjectives:** delve, leverage, harness, foster, bolster,
+underscore, showcase, illuminate, facilitate, garner, navigate (figurative),
+unpack (figurative), elevate, streamline, spearhead, robust, seamless,
+meticulous, intricate, comprehensive, pivotal, crucial, vital, key (as an
+adjective), multifaceted, nuanced, holistic, vibrant, compelling.
+
+**Metaphor nouns dropped in for color:** tapestry, landscape, realm, ecosystem
+(outside actual software ecosystems), beacon, cornerstone, backbone, lifeblood,
+north star, journey, deep dive, game-changer, paradigm, interplay, symphony.
+
+**Significance inflation:** "a testament to", "stands as", "serves as", "plays
+a crucial role", "underscores the importance of", "marks a shift", "at its
+core", "the reality is", "it's worth noting", "fundamentally", "profound",
+"transformative", "powerful" (about code), "elegant" (about your own work).
+
+**Transition scaffolding:** moreover, furthermore, additionally, notably,
+importantly, that said (as a paragraph opener), in today's fast-paced X, when
+it comes to X, let's dive in.
+
+**Hedge-and-flatter openers:** "Great question", "You're absolutely right",
+"I hope this finds you well", "Certainly!", "Absolutely."
+
+Beyond the list, the smell is the same everywhere: a word chosen because it
+sounds like expertise. Use the word you would use out loud to a colleague. If
+a sentence would survive being said in a hallway, it is fine. Ordinary verbs
+(has, uses, breaks, runs, needs, sends) beat elevated ones every time.
+
+Structural tells that travel with the vocabulary, banned with it: three-item
+lists where two items are real, uniform sentence length across a paragraph,
+bolding a phrase in every bullet, title case in headings, emoji as section
+markers.
+
 ## Everything else
 
-- **No em-dashes.** Ever. Commas, colons, or a second sentence instead.
+- **Go easy on em-dashes.** A comma, colon, or second sentence is usually better. Use one when it genuinely reads best.
 - **Don't count what follows.** No "Three things...", no "Two reasons...". Just say them.
 - **Don't announce a question, ask it.** Not "One question for you: should we X?", just "Should we X?".
 - **No framing about the text itself.** Cut "Quick framing first", "To be clear", "I don't want this read as...". If the work is scoped right, it shows.
