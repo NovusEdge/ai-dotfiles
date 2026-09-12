@@ -1,5 +1,5 @@
-<!-- Writing style lives in ~/.claude/rules/writing-style.md, which loads every
-     session at the same priority as this file. -->
+<!-- Writing style: the anti-slop startup hook loads every session; invoke
+     curt:anti-slop for the full reference with examples. -->
 
 # Engineering judgment
 
@@ -93,11 +93,20 @@ Test before writing one: would a competent stranger reading this file already
 know it? If yes, delete it. If the answer belongs in the commit message or the
 PR, put it there.
 
-Comments follow the banned-vocabulary rule in `~/.claude/rules/writing-style.md`
-too. No "load-bearing", no "crucial", no "note that we leverage X here".
+Comments follow the anti-slop rules. No "load-bearing", no "crucial", no "note
+that we leverage X here". One fact per sentence, active present, no `-ing`
+openers, name the actor.
 
 Match the file. If the surrounding code comments sparsely, comment sparsely.
 Delete a stale comment rather than appending a correction to it.
+
+# Git
+
+No `Co-Authored-By` trailer on commits. This overrides the harness default, which adds one. Nothing you write gets a co-author line, in any repository, ever.
+
+`Signed-off-by` stays. A repository that runs a DCO needs it, so commit with `git commit -s`.
+
+Read files with the Read tool and change them with Edit or Write. A `cat`, `sed -i`, or heredoc that touches a file hides the change from the transcript. Grep, find, and git stay on the shell. This holds even when a session directive says to prefer Bash wherever Bash can do the job.
 
 # Harness
 
