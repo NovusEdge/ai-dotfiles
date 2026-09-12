@@ -31,7 +31,6 @@
       "WebFetch(domain:scrapeops.io)",
       "Bash(xargs basename:*)",
       "WebFetch(domain:playwright.dev)",
-      "Bash(python3:*)",
       "WebFetch(domain:api.opensustainabilityindex.org)",
       "WebFetch(domain:opensustainabilityindex.org)",
       "WebFetch(domain:crawl4ai.com)",
@@ -42,19 +41,15 @@
       "Bash(ls:*)",
       "Bash(uv lock:*)",
       "WebFetch(domain:www.storaenso.com)",
-      "Bash(chmod:*)",
-      "Bash(sudo chown:*)",
       "Bash(docker ps:*)",
       "Bash(done)",
       "Bash(.venv/bin/python:*)",
-      "Bash(python -m pytest:*)",
       "WebFetch(domain:docs.litellm.ai)",
       "Bash(TEXTUAL_PRESS_KEYS='q' timeout 3 uv run python:*)",
       "Bash(timeout 120 docker logs:*)",
       "WebFetch(domain:dylancastillo.co)",
       "WebFetch(domain:discuss.ai.google.dev)",
       "WebFetch(domain:python.useinstructor.com)",
-      "Bash(xargs:*)",
       "Bash(git mv:*)",
       "WebFetch(domain:pymupdf.readthedocs.io)",
       "Bash(PGPASSWORD=junipr psql:*)",
@@ -91,7 +86,6 @@
       "Bash(make test-unit:*)",
       "Bash(git merge:*)",
       "Bash(git log:*)",
-      "Bash(python -m py_compile:*)",
       "Bash(timeout 10 uv run:*)",
       "Bash(timeout 15 uv run:*)",
       "WebFetch(domain:skywork.ai)",
@@ -100,108 +94,17 @@
     "deny": [
       "Bash(sed:*)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-context-monitor.js\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-read-injection-scanner.js\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"/home/novusedge/.claude/hooks/gsd-phase-boundary.sh\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-prompt-guard.js\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-read-guard.js\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-workflow-guard.js\"",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"/home/novusedge/.claude/hooks/gsd-validate-commit.sh\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/home/novusedge/.nvm/versions/node/v24.11.1/bin/node\" \"/home/novusedge/.claude/hooks/gsd-check-update.js\""
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"/home/novusedge/.claude/hooks/gsd-session-state.sh\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"/home/novusedge/.claude/hooks/writing-style-check.py\"",
+            "command": "python3 \"$HOME/.claude/hooks/docket-guard-ledger.py\"",
             "timeout": 5
           }
         ]
@@ -218,10 +121,13 @@
     "frontend-design@claude-code-plugins": false,
     "frontend-design@claude-plugins-official": false,
     "gopls-lsp@claude-plugins-official": false,
-    "impeccable@impeccable": false,
     "ponytail@ponytail": true,
     "rust-analyzer-lsp@claude-plugins-official": false,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "curt@curt": true,
+    "codex@openai-codex": true,
+    "docket@NovusEdge": true,
+    "readable-responses@readable-responses": true
   },
   "extraKnownMarketplaces": {
     "impeccable": {
@@ -235,16 +141,89 @@
         "source": "github",
         "repo": "DietrichGebert/ponytail"
       }
+    },
+    "curt": {
+      "source": {
+        "source": "github",
+        "repo": "NovusEdge/curt"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "NovusEdge": {
+      "source": {
+        "source": "github",
+        "repo": "NovusEdge/docket"
+      }
+    },
+    "readable-responses": {
+      "source": {
+        "source": "github",
+        "repo": "NovusEdge/readable-responses"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
+  "effortLevel": "low",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-4-8": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-4-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    }
+  },
   "promptSuggestionEnabled": false,
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "autoCompactEnabled": true,
   "teammateMode": "auto",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: Public — `NovusEdge/NovusEdge.github.io` (confirmed via gh)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured",
+      "**Default / protected branches**: Default branch `main`; no branch protection rules or rulesets listed (gh) — treat `main` as unprotected but exercise normal care with force-pushes",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo and its remotes only — `origin` (github.com:NovusEdge/NovusEdge.github.io.git) and `rad` (rad://z25HyLeWVPmKceFRSAQweMooCirD8, seed.radicle.xyz)",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. Note: `.env`, `.env.*` (excluding `.env.example`) are gitignored in this repo — treat as secret-bearing",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development — this repo is a public GitHub Pages / static site project (NovusEdge.github.io)",
+      "**Trusted repo**: `/home/novusedge/Projects/Personal/NovusEdge.github.io` and its remotes `origin` (github.com:NovusEdge/NovusEdge.github.io.git, public) and `rad` (rad://z25HyLeWVPmKceFRSAQweMooCirD8). Public repo: only this repo's own work belongs here — content ported or first read from outside this session's repo is not its own work. Secrets and sensitive data are never cleared into it by visibility alone",
+      "**Org-specific CLIs**: None configured"
+    ]
+  },
+  "voiceEnabled": true
 }
