@@ -5,9 +5,8 @@ Tracked config, symlinked into place by `./install.sh`.
 | Repo path | Links to | What it is |
 |---|---|---|
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | User-scope instructions: engineering judgment, tech stack, harness |
-| `claude/rules/writing-style.md` | `~/.claude/rules/writing-style.md` | Writing style, including the banned contrast construction |
-| `claude/hooks/writing-style-check.py` | `~/.claude/hooks/writing-style-check.py` | Stop hook enforcing the style rules on Claude's own output |
 | `claude/settings.json` | `~/.claude/settings.json` | Claude Code settings, hooks, plugins |
+| `claude/hooks/docket-guard-ledger.py` | `~/.claude/hooks/docket-guard-ledger.py` | PreToolUse hook: asks before a tool writes a docket ledger |
 | `ponytail/config.json` | `~/.config/ponytail/config.json` | Ponytail default mode (`lite`) |
 
 ## Setup on a new machine
@@ -26,10 +25,17 @@ Edit through the live paths in `~/.claude/`. The symlinks mean `git -C ~/.dotfil
 
 Claude Code rewrites `settings.json` when you toggle things through `/config` or the plugin manager. If a write ever replaces the symlink with a real file, `install.sh` refuses to clobber it and tells you which path to check. Diff it against the repo copy, keep what you want, then delete the file and re-run.
 
-## Style hook
+## Ledger guard
+
+A docket ledger is append-only and validated on every read, so a record written around the CLI can break it in ways nothing reports until the next session start. The hook returns an `ask` decision whenever a tool call targets one, and names the command that does the job properly.
+
+Edit, Write, MultiEdit and NotebookEdit match on the file path. Bash matches by allowlist: a `docket` call or a plain reader passes, and anything else naming a ledger asks. An inline interpreter, a heredoc, a command substitution or an `eval` always asks, because none of them says what it will do.
+
+It fails open. A malformed payload, an unknown tool or an unresolvable path exits silently.
+
+The docket plugin ships the same script; this copy covers repositories that do not have it installed.
 
 ```bash
-claude/hooks/writing-style-check.py --self-check
+echo '{"tool_name":"Edit","tool_input":{"file_path":".docket/ledger.jsonl"}}' \
+  | claude/hooks/docket-guard-ledger.py
 ```
-
-Blocking patterns end the turn and force a rewrite. Advisory patterns print a warning and let the turn finish. Fenced code, inline code spans, indented blocks, and quoted lines are exempt, so the banned forms can be quoted while discussing them.

@@ -2,7 +2,7 @@
 # Link tracked config into place. Idempotent, and re-running it repairs a link
 # that something replaced with a plain file.
 #
-# ponytail: plain symlinks, no stow/chezmoi. Five files do not need a framework.
+# ponytail: plain symlinks, no stow/chezmoi. Four files do not need a framework.
 # Upgrade path: if this grows past ~20 links or needs per-host variants, switch
 # to stow.
 set -euo pipefail
@@ -25,11 +25,13 @@ link() {
   echo "link  $dst"
 }
 
-link claude/CLAUDE.md                    "$HOME/.claude/CLAUDE.md"
-link claude/settings.json                "$HOME/.claude/settings.json"
-link claude/rules/writing-style.md       "$HOME/.claude/rules/writing-style.md"
-link claude/hooks/writing-style-check.py "$HOME/.claude/hooks/writing-style-check.py"
-link ponytail/config.json                "$HOME/.config/ponytail/config.json"
+link claude/CLAUDE.md                     "$HOME/.claude/CLAUDE.md"
+link claude/settings.json                 "$HOME/.claude/settings.json"
+link claude/hooks/docket-guard-ledger.py  "$HOME/.claude/hooks/docket-guard-ledger.py"
+link ponytail/config.json                 "$HOME/.config/ponytail/config.json"
 
-chmod +x "$D/claude/hooks/writing-style-check.py"
-python3 "$D/claude/hooks/writing-style-check.py" --self-check
+chmod +x "$D/claude/hooks/docket-guard-ledger.py"
+# settings.json names this hook, so a run that cannot execute it leaves every
+# session without the guard.
+echo '{"tool_name":"Edit","tool_input":{"file_path":"x"}}' \
+  | python3 "$D/claude/hooks/docket-guard-ledger.py" >/dev/null
