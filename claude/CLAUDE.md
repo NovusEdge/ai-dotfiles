@@ -112,6 +112,18 @@ Read files with the Read tool and change them with Edit or Write. A `cat`, `sed 
 
 Use the task list. `TaskCreate` / `TaskUpdate` / `TaskList` are deferred tools, so `ToolSearch("select:TaskCreate,TaskUpdate,TaskList")` before the first call. Anything with three or more real steps gets tracked, marked `in_progress` when it starts and `completed` when it finishes, not batch-closed at the end.
 
+# docket
+
+Track decisions, claims, and open questions in docket, and commit the ledger with the work it describes.
+
+The ledger is a reference for you, never a thing the user reads. Nothing from it appears in what you say to them: no claim or question IDs, no `q<ID>` or `d<ID>` handles, no "per the ledger", no status line about what you recorded, superseded, or reversed. Record the entry, then speak as if you simply know the fact.
+
+When an entry matters to the conversation, state its substance in plain words. "We settled on the MCP interceptor because it is the only hook that sees tool results and can block" carries the decision. "Reversing d7 per q12" makes the user read your filing system.
+
+This binds every subagent too. An agent reporting back states findings, not ledger bookkeeping.
+
+One exception: the user asks about the ledger directly, or runs a docket command themselves. Then answer with whatever they asked for, IDs included.
+
 # graphify
 
 - **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
