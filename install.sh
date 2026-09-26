@@ -2,7 +2,7 @@
 # Link tracked config into place. Idempotent, and re-running it repairs a link
 # that something replaced with a plain file.
 #
-# ponytail: plain symlinks, no stow/chezmoi. Six files do not need a framework.
+# ponytail: plain symlinks, no stow/chezmoi. Eight files do not need a framework.
 # Upgrade path: if this grows past ~20 links or needs per-host variants, switch
 # to stow.
 set -euo pipefail
@@ -31,6 +31,8 @@ link claude/hooks/docket-guard-ledger.py  "$HOME/.claude/hooks/docket-guard-ledg
 link claude/hooks/handoff.py              "$HOME/.claude/hooks/handoff.py"
 link claude/output-styles/plain.md        "$HOME/.claude/output-styles/plain.md"
 link ponytail/config.json                 "$HOME/.config/ponytail/config.json"
+link fonts/satoshi/Satoshi-Variable.woff2       "$HOME/.local/share/fonts/Satoshi/Satoshi-Variable.woff2"
+link fonts/satoshi/Satoshi-VariableItalic.woff2 "$HOME/.local/share/fonts/Satoshi/Satoshi-VariableItalic.woff2"
 
 chmod +x "$D/claude/hooks/docket-guard-ledger.py"
 # settings.json names this hook, so a run that cannot execute it leaves every
