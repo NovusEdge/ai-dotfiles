@@ -7,12 +7,16 @@ Tracked config, symlinked into place by `./install.sh`.
 | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` | User-scope instructions: engineering judgment, tech stack, harness |
 | `claude/settings.json` | `~/.claude/settings.json` | Claude Code settings, hooks, plugins |
 | `claude/hooks/docket-guard-ledger.py` | `~/.claude/hooks/docket-guard-ledger.py` | PreToolUse hook: asks before a tool writes a docket ledger |
-| `ponytail/config.json` | `~/.config/ponytail/config.json` | Ponytail default mode (`lite`) |
+| `claude/hooks/handoff.py` | `~/.claude/hooks/handoff.py` | SessionStart hook: per-project handoff file carried across `/clear` |
+| `claude/output-styles/plain.md` | `~/.claude/output-styles/plain.md` | Output style for chat replies |
+| `ponytail/config.json` | `~/.config/ponytail/config.json` | Ponytail default mode (`off`) |
+
+`settings.json` holds work environment details in `autoMode.environment`. Keep this repo private.
 
 ## Setup on a new machine
 
 ```bash
-git clone <remote> ~/.dotfiles && ~/.dotfiles/install.sh
+git clone git@github.com:NovusEdge/ai-dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh
 ```
 
 ## Editing
