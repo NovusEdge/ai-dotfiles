@@ -68,7 +68,7 @@ An artifact is a visual medium, so a page of paragraphs wastes it. Before writin
 - A sequence of events gets a timeline.
 - A single key figure gets a stat callout.
 
-Prose captions and connects the visuals: what to look at, and what it means. It does not repeat what a figure already shows. Load the artifact-design skill first, and artifact-diagramming or dataviz for the diagrams and charts.
+Prose captions and connects the visuals: what to look at, and what it means. It does not repeat what a figure already shows. Load `polished-artifacts:core` before building any artifact; it loads artifact-design, picks the Carbon or Apple look, and sets the diagram and chart libraries.
 
 ## Overcorrection
 
