@@ -40,6 +40,10 @@ Explain behavior. Do not comment on your own point. Each of these reads as marke
 
 Keep internal bookkeeping out of replies: no decision or ticket IDs, no references to history the user was not part of.
 
+## Flow
+
+Each sentence picks up something from the one before it: the same subject, the result it produced, or the reason it holds. Name the relationship with the connective that fits it ("because", "so", "which means", "until") instead of stacking independent statements. Vary sentence length, and let a short sentence land after a longer one that set it up. Open a paragraph with the point it makes, not with background.
+
 ## Structure
 
 Short chat answers are connected prose. Anything the reader will scan rather than read straight through gets structure: a reply past about 150 words, and every document, artifact, spec, README or report you write. In those:

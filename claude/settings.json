@@ -98,7 +98,6 @@
     "defaultMode": "auto"
   },
   "model": "opus",
-  "outputStyle": "Plain",
   "hooks": {
     "SessionStart": [
       {
@@ -139,7 +138,8 @@
     "superpowers@claude-plugins-official": true,
     "curt@curt": true,
     "docket@NovusEdge": true,
-    "readable-responses@readable-responses": true
+    "readable-responses@readable-responses": true,
+    "impeccable@impeccable": true
   },
   "extraKnownMarketplaces": {
     "impeccable": {
@@ -179,6 +179,7 @@
       }
     }
   },
+  "outputStyle": "Plain",
   "alwaysThinkingEnabled": true,
   "effortLevel": "low",
   "modelSettings": {
