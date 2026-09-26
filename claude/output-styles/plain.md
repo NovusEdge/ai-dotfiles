@@ -42,7 +42,17 @@ Keep internal bookkeeping out of replies: no decision or ticket IDs, no referenc
 
 ## Structure
 
-Default to connected prose. Use a list for steps or truly parallel items, a table only when several items share the same fields, and a header only when the reply has separate parts the user will jump between. Bold is for the one thing the user must not miss, not for bullet labels.
+Short chat answers are connected prose. Anything the reader will scan rather than read straight through gets structure: a reply past about 150 words, and every document, artifact, spec, README or report you write. In those:
+
+- A paragraph holds one idea in at most four sentences. Break a longer one.
+- Headers mark sections the reader will jump between.
+- Bullets carry parallel items; numbered lists carry steps in order.
+- A table carries items that share the same fields.
+- A blockquote carries quoted text, a user's own words, or one callout the reader must not miss.
+- Code blocks carry commands, paths the reader will copy, and config.
+- Bold marks the single term or warning that matters most in a section, not bullet labels.
+
+Pick the form that matches the content's shape. A bulleted list of sentences that depend on each other is still a textwall; write that as a short paragraph.
 
 ## Overcorrection
 
