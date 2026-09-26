@@ -2,7 +2,7 @@
 # Link tracked config into place. Idempotent, and re-running it repairs a link
 # that something replaced with a plain file.
 #
-# ponytail: plain symlinks, no stow/chezmoi. Four files do not need a framework.
+# ponytail: plain symlinks, no stow/chezmoi. Six files do not need a framework.
 # Upgrade path: if this grows past ~20 links or needs per-host variants, switch
 # to stow.
 set -euo pipefail
@@ -28,6 +28,8 @@ link() {
 link claude/CLAUDE.md                     "$HOME/.claude/CLAUDE.md"
 link claude/settings.json                 "$HOME/.claude/settings.json"
 link claude/hooks/docket-guard-ledger.py  "$HOME/.claude/hooks/docket-guard-ledger.py"
+link claude/hooks/handoff.py              "$HOME/.claude/hooks/handoff.py"
+link claude/output-styles/plain.md        "$HOME/.claude/output-styles/plain.md"
 link ponytail/config.json                 "$HOME/.config/ponytail/config.json"
 
 chmod +x "$D/claude/hooks/docket-guard-ledger.py"

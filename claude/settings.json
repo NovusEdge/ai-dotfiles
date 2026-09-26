@@ -1,6 +1,7 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
   },
   "permissions": {
     "allow": [
@@ -96,8 +97,20 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "opus",
+  "outputStyle": "Plain",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME/.claude/hooks/handoff.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
@@ -125,7 +138,6 @@
     "rust-analyzer-lsp@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
     "curt@curt": true,
-    "codex@openai-codex": true,
     "docket@NovusEdge": true,
     "readable-responses@readable-responses": true
   },
@@ -184,6 +196,9 @@
     },
     "claude-fable-5-1": {
       "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
@@ -194,35 +209,36 @@
   },
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
-  "autoCompactEnabled": true,
+  "autoCompactEnabled": false,
+  "switchModelsOnFlag": false,
   "teammateMode": "auto",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "autoMode": {
     "environment": [
       "### Org-wide",
-      "**Organization**: None configured",
-      "**Cloud provider(s)**: None configured",
-      "**Repository visibility**: Public — `NovusEdge/NovusEdge.github.io` (confirmed via gh)",
+      "**Organization**: botspot-org (bot.spot). GitHub org `botspot-org`, private repositories",
+      "**Cloud provider(s)**: GCP, single project `bot-backends`. Regions `europe-north1` (Cloud Run, Cloud SQL, GCE data disks) and `europe-west4` (Dagster VM, GPU inference)",
+      "**Repository visibility**: Private — every `botspot-org` repository. The one public repo is the personal `NovusEdge/NovusEdge.github.io`, unrelated to this work",
       "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
-      "**Secrets management**: None configured",
-      "**Default / protected branches**: Default branch `main`; no branch protection rules or rulesets listed (gh) — treat `main` as unprotected but exercise normal care with force-pushes",
-      "**CI/CD deploy targets**: None configured",
-      "**Network posture**: None configured",
-      "**Source control**: The trusted repo and its remotes only — `origin` (github.com:NovusEdge/NovusEdge.github.io.git) and `rad` (rad://z25HyLeWVPmKceFRSAQweMooCirD8, seed.radicle.xyz)",
-      "**Trusted internal domains**: None configured",
-      "**Trusted cloud buckets**: None configured",
-      "**Key internal services**: None configured",
-      "**Internal package registry**: None configured",
-      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. Note: `.env`, `.env.*` (excluding `.env.example`) are gitignored in this repo — treat as secret-bearing",
-      "**Data retention / declassification**: None configured",
-      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
-      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
-      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "**Secrets management**: Google Secret Manager in `bot-backends`, named `locus-{environment}-{name}`. Terraform owns the containers and never the values (`manage_secret_versions = false`); values are pushed with `scripts/secrets/cli.py push`. Reading, disabling, enabling and deleting these secrets is routine operational work for this user",
+      "**Default / protected branches**: `main` is the default everywhere. No branch protection or environment protection rules exist on any repository, verified 2026-09-13 — `main` and `staging` are unprotected in practice",
+      "**CI/CD deploy targets**: GitHub Actions is the standard path. locus-core: push to `staging` deploys staging; a `v*` tag on `main` deploys production. locus-models: push to `staging` migrates the staging database; the manual `migrate-production.yml` workflow_dispatch migrates production. locus-connectors: push to `staging` deploys staging. Dispatching these workflows, including the production ones, is this user's normal release procedure",
+      "**Network posture**: Cloud Run services are public for customer traffic; data stores sit on private VPCs reached through IAP tunnels. Both Cloud SQL instances require TLS (`ENCRYPTED_ONLY`)",
+      "**Source control**: The four `botspot-org` repositories below and their `origin` remotes on github.com",
+      "**Trusted internal domains**: `bot.spot` and its subdomains, `*.run.app` services under `bot-backends`, `botspot.run`",
+      "**Trusted cloud buckets**: `botspot-widget-{env}` and the terraform state buckets in `bot-backends`",
+      "**Key internal services**: `locus-{env}-api`, `locus-{env}-connectors`, `locus-{env}-mcp` on Cloud Run; `locus-{env}-dagster-daemon`, `locus-{env}-qdrant`, `locus-{env}-memgraph` on GCE; `locus-gliner` and `locus-nli` shared between environments",
+      "**Internal package registry**: `locus-models` publishes wheels; images live in `europe-north1-docker.pkg.dev/bot-backends/locus-{env}`",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. `.env`, `.env.*` (excluding `.env.example`) and `*.secrets.tfvars` are gitignored — treat as secret-bearing",
+      "**Data retention / declassification**: `auth.audit_logs` 12 months, `connector.sync_logs` 90 days, `oculus.*` 24 months, swept by a Dagster asset",
+      "**Sensitive remote targets**: anything whose name carries `prod` or `production` as a whole word or name segment, and the `locus-production-*` resources specifically",
+      "**Protected deployment namespaces / environments**: production Cloud Run services and the production Cloud SQL instance. Changes there reach customers, so confirm intent, then proceed — this user drives production releases as routine work",
+      "**Protected IaC scopes**: IAM, networking, and anything named `prod` or `production`. Terraform runs through `just tf-foundation {env}` and `just tf-services {env}`; `terraform state rm` and `terraform import` are normal reconciliation tools here",
       "### User-specific",
-      "**Primary use of Claude Code**: software development — this repo is a public GitHub Pages / static site project (NovusEdge.github.io)",
-      "**Trusted repo**: `/home/novusedge/Projects/Personal/NovusEdge.github.io` and its remotes `origin` (github.com:NovusEdge/NovusEdge.github.io.git, public) and `rad` (rad://z25HyLeWVPmKceFRSAQweMooCirD8). Public repo: only this repo's own work belongs here — content ported or first read from outside this session's repo is not its own work. Secrets and sensitive data are never cleared into it by visibility alone",
-      "**Org-specific CLIs**: None configured"
+      "**Primary use of Claude Code**: platform engineering on Locus, a source-agnostic semantic enrichment engine. Day-to-day work spans application code, terraform, database migrations, GCP operations, and release management across staging and production",
+      "**Trusted repos**: `/home/novusedge/Projects/BotDot/locus-core`, `locus-models`, `locus-connectors`, and `botspot-docs`, all on `github.com/botspot-org`. Also present and read-only: `bot.dashboard`, which belongs to another team and must never be modified",
+      "**Org-specific CLIs**: `just` (the recipe runner for every repo), `gcloud`, `gh`, `terraform`, `uv`, and `scripts/secrets/cli.py`"
     ]
   },
   "voiceEnabled": true

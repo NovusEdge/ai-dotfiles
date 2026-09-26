@@ -1,4 +1,4 @@
-<!-- Writing style: the anti-slop startup hook loads every session; invoke
+<!-- Writing style: the curt plugin's hooks load every session; invoke
      curt:anti-slop for the full reference with examples. -->
 
 # Engineering judgment
@@ -19,32 +19,23 @@ The existing stack wins ties. A new dependency has to beat what is already insta
 
 ## Comments
 
-Judge a comment by what is in it. A comment earns its place by carrying a fact
-the reader cannot get from the code: why this branch exists, what breaks if the
-order changes, which constraint outside this file forced the shape, what bug it
-already shipped. Everything else is filler, whatever its length. A dense
-four-line comment about a locking invariant is right; one line restating the
-call below it is wrong.
+A comment earns its place by carrying a fact the reader cannot get from the code: why this branch exists, what breaks if the order changes, which constraint outside this file forced the shape, what bug it already shipped. Length is not the test. A dense four-line comment about a locking invariant is right; one line restating the call below it is wrong.
 
 Content that does not belong in source:
 
-- Paraphrase of the code (`// increment the counter`, a docstring that repeats the signature).
-- The story of how the answer was found: what was tried, what was verified, what an earlier version got wrong, what the tool output said. Commit message.
-- Justification aimed at me rather than the next reader ("as you requested", "note that we now...", defending a design nobody questioned).
-- Restating the ticket or the task description at the top of a function.
+- Paraphrase of the code, or a docstring that repeats the signature.
+- The story of how the answer was found. Commit message.
+- Justification aimed at me rather than the next reader ("as you requested", "note that we now...").
+- The ticket or task description restated at the top of a function.
 - Section banners and dividers.
 
-Exported API in a language whose tooling consumes docstrings is the exception:
-write the real doc there.
-
-Examples. Each bad one below is real shape, not a strawman.
+Exported API in a language whose tooling consumes docstrings is the exception: write the real doc there.
 
 ```go
-// BAD — narrates the investigation and the diff
+// BAD — narrates the investigation
 // Originally we called Stop() here, but it turned out that Stop() only sends
 // SIGTERM and does not wait for the process to exit, which we confirmed by
-// running the test 20 times and seeing 3 failures. So now we call Wait()
-// after Stop(). See the discussion above about why the first fix was wrong.
+// running the test 20 times and seeing 3 failures. So now we call Wait().
 vm.Stop(); vm.Wait()
 
 // GOOD — the fact you cannot see from the call
@@ -52,53 +43,18 @@ vm.Stop(); vm.Wait()
 vm.Stop(); vm.Wait()
 ```
 
-```python
-# BAD — paraphrase
-# loop over the users and send each one an email
-for user in users:
-    send(user)
+Match the file's comment density. Delete a stale comment rather than appending a correction to it.
 
-# GOOD — nothing. The code says it. No comment at all.
-for user in users:
-    send(user)
-```
+## CLAUDE.md files
 
-```ts
-// BAD — addressed to me, not to the reader
-// Updated this per your request to use the new API. Note that we now handle
-// the null case as you pointed out.
-const name = user?.name ?? "anon"
+When you write or update a project CLAUDE.md, `/init` included, keep only what Claude would get wrong without it:
 
-// GOOD — the constraint that forced it
-// Legacy rows predate the NOT NULL migration; name is null for ~4k of them.
-const name = user?.name ?? "anon"
-```
+- Commands that cannot be discovered: non-obvious build or test invocations, required env vars, setup order.
+- Conventions that differ from the language or framework default.
+- Architecture decisions and the reason for each.
+- Gotchas: behavior that surprises a competent reader of the code.
 
-```rust
-// GOOD — four lines, none of them skippable
-// Lock order is always registry then vm, never the reverse: the reaper thread
-// takes registry while holding no vm lock, so acquiring vm first here would
-// deadlock it. Any new path that touches both must follow this order.
-let reg = self.registry.lock();
-let vm = reg.get(id)?.lock();
-```
-
-```sql
--- GOOD — a fact about the data, invisible in the query
--- events is partitioned by day; unbounded scans here have OOM'd prod twice.
-select ... where day >= current_date - 7
-```
-
-Test before writing one: would a competent stranger reading this file already
-know it? If yes, delete it. If the answer belongs in the commit message or the
-PR, put it there.
-
-Comments follow the anti-slop rules. No "load-bearing", no "crucial", no "note
-that we leverage X here". One fact per sentence, active present, no `-ing`
-openers, name the actor.
-
-Match the file. If the surrounding code comments sparsely, comment sparsely.
-Delete a stale comment rather than appending a correction to it.
+Leave out anything `ls`, `--help`, a manifest (`package.json`, `pyproject.toml`, `Makefile`, `justfile`) or the code itself shows: file trees, directory tours, command and flag reference, dependency lists, standard conventions, generic advice. Test each line: would deleting it cause a mistake? Aim for under 60 lines.
 
 # Git
 
@@ -110,21 +66,12 @@ Read files with the Read tool and change them with Edit or Write. A `cat`, `sed 
 
 # Harness
 
-Use the task list. `TaskCreate` / `TaskUpdate` / `TaskList` are deferred tools, so `ToolSearch("select:TaskCreate,TaskUpdate,TaskList")` before the first call. Anything with three or more real steps gets tracked, marked `in_progress` when it starts and `completed` when it finishes, not batch-closed at the end.
+Use the task list for anything with three or more real steps: `in_progress` when a step starts, `completed` when it finishes, not batch-closed at the end. The task tools are deferred; `ToolSearch("select:TaskCreate,TaskUpdate,TaskList")` first. The list persists per repo across `/clear`, so keep it accurate.
+
+Pick the waiting tool by what ends the wait. A command that exits (build, test run, install) runs in Bash with `run_in_background`; the harness wakes you when it exits. A stream you watch for a condition (logs, CI, a deploy, a port coming up) goes to `Monitor`, which is deferred, so `ToolSearch("select:Monitor")` first. Never poll with foreground `sleep` loops or repeated status commands.
 
 # docket
 
 Track decisions, claims, and open questions in docket, and commit the ledger with the work it describes.
 
-The ledger is a reference for you, never a thing the user reads. Nothing from it appears in what you say to them: no claim or question IDs, no `q<ID>` or `d<ID>` handles, no "per the ledger", no status line about what you recorded, superseded, or reversed. Record the entry, then speak as if you simply know the fact.
-
-When an entry matters to the conversation, state its substance in plain words. "We settled on the MCP interceptor because it is the only hook that sees tool results and can block" carries the decision. "Reversing d7 per q12" makes the user read your filing system.
-
-This binds every subagent too. An agent reporting back states findings, not ledger bookkeeping.
-
-One exception: the user asks about the ledger directly, or runs a docket command themselves. Then answer with whatever they asked for, IDs included.
-
-# graphify
-
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+The ledger is for you, never for the user. Replies carry no claim or question IDs, no "per the ledger", no status line about what you recorded or reversed. When an entry matters, state its substance in plain words. This binds subagents too. The exception: the user asks about the ledger or runs a docket command.
