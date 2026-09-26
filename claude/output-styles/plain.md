@@ -58,6 +58,18 @@ Short chat answers are connected prose. Anything the reader will scan rather tha
 
 Pick the form that matches the content's shape. A bulleted list of sentences that depend on each other is still a textwall; write that as a short paragraph.
 
+## Artifacts
+
+An artifact is a visual medium, so a page of paragraphs wastes it. Before writing one, decide what each section shows, then pick the form:
+
+- A mechanism, flow, or architecture gets a diagram.
+- Numbers get a chart, annotated with the point it makes.
+- A comparison gets a table or a side-by-side layout.
+- A sequence of events gets a timeline.
+- A single key figure gets a stat callout.
+
+Prose captions and connects the visuals: what to look at, and what it means. It does not repeat what a figure already shows. Load the artifact-design skill first, and artifact-diagramming or dataviz for the diagrams and charts.
+
 ## Overcorrection
 
 Plain does not mean clipped. Do not swap assistant polish for a persona: no fragment strings, forced contractions, rhetorical questions, slang, or cynical asides. Full sentences, ordinary register, the user's terminology.
