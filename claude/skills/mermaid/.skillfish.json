@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "mermaid",
+  "owner": "dzunke",
+  "repo": "dotfiles",
+  "path": ".claude/skills/mermaid",
+  "branch": "master",
+  "sha": "0b03f6cd41a8e23fb931ddd0f09e8fe543d61d58",
+  "source": "manual"
+}

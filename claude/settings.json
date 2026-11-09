@@ -30,8 +30,8 @@
       "**Protected IaC scopes**: IAM, networking, and anything named `prod` or `production`. Terraform runs through `just tf-foundation {env}` and `just tf-services {env}`; `terraform state rm` and `terraform import` are normal reconciliation tools here",
       "### User-specific",
       "**Primary use of Claude Code**: general software engineering across work and personal projects: application code, infrastructure, tooling, docs sites, releases, and demo media. No single project is the main one",
-      "**Trusted repos**: `/home/novusedge/Projects/BotDot/locus-core`, `locus-models`, `locus-connectors`, and `botspot-docs`, all on `github.com/botspot-org`. Also present and read-only: `bot.dashboard`, which belongs to another team and must never be modified",
-      "**Personal repos**: any repo under `/home/novusedge/Projects/` whose `origin` is `github.com/NovusEdge/*` is the user's own and trusted, including pushing and publishing releases",
+      "**Trusted repos**: `@HOME@/Projects/BotDot/locus-core`, `locus-models`, `locus-connectors`, and `botspot-docs`, all on `github.com/botspot-org`. Also present and read-only: `bot.dashboard`, which belongs to another team and must never be modified",
+      "**Personal repos**: any repo under `@HOME@/Projects/` whose `origin` is `github.com/NovusEdge/*` is the user's own and trusted, including pushing and publishing releases",
       "**Visual testing**: starting a throwaway Claude Code session in tmux inside the session scratchpad, typing into it, capturing the pane and recording it is routine UI testing of tools the user builds",
       "**Org-specific CLIs**: `just` (the recipe runner for every repo), `gcloud`, `gh`, `terraform`, `uv`, and `scripts/secrets/cli.py`"
     ]
@@ -41,45 +41,45 @@
   "effortLevel": "low",
   "enabledPlugins": {
     "cloudflare@cloudflare": true,
-    "competitive-analysis-process@nimble-fox": true,
-    "competitive-research-snapshot@nimble-fox": true,
+    "competitive-analysis-process@nimble-fox": false,
+    "competitive-research-snapshot@nimble-fox": false,
     "curt@curt": true,
-    "derisk-measurement-advisor@nimble-fox": true,
-    "discovery-interview-prep@nimble-fox": true,
+    "derisk-measurement-advisor@nimble-fox": false,
+    "discovery-interview-prep@nimble-fox": false,
     "docket@NovusEdge": true,
     "drygate@drygate": true,
-    "finance-based-pricing-advisor@nimble-fox": true,
+    "finance-based-pricing-advisor@nimble-fox": false,
     "frontend-design-pro@frontend-design-pro": false,
     "frontend-design@claude-code-plugins": false,
     "frontend-design@claude-plugins-official": false,
     "glowup@glowup": true,
     "gopls-lsp@claude-plugins-official": false,
     "impeccable@impeccable": true,
-    "jobs-to-be-done@nimble-fox": true,
+    "jobs-to-be-done@nimble-fox": false,
     "motion-lab@motion-lab": true,
-    "opportunity-solution-tree@nimble-fox": true,
-    "pm-skills@nimble-fox": true,
+    "opportunity-solution-tree@nimble-fox": false,
+    "pm-skills@nimble-fox": false,
     "polished-artifacts@polished-artifacts": true,
     "ponytail@ponytail": true,
-    "positioning-statement@nimble-fox": true,
-    "prd-development@nimble-fox": true,
-    "press-release@nimble-fox": true,
-    "pricing-packaging-tracker@nimble-fox": true,
-    "prioritization-advisor@nimble-fox": true,
-    "problem-statement@nimble-fox": true,
-    "proto-persona@nimble-fox": true,
+    "positioning-statement@nimble-fox": false,
+    "prd-development@nimble-fox": false,
+    "press-release@nimble-fox": false,
+    "pricing-packaging-tracker@nimble-fox": false,
+    "prioritization-advisor@nimble-fox": false,
+    "problem-statement@nimble-fox": false,
+    "proto-persona@nimble-fox": false,
     "readable-responses@readable-responses": true,
-    "roadmap-planning@nimble-fox": true,
+    "roadmap-planning@nimble-fox": false,
     "rust-analyzer-lsp@claude-plugins-official": false,
-    "saas-economics-efficiency-metrics@nimble-fox": true,
+    "saas-economics-efficiency-metrics@nimble-fox": false,
     "software-architecture@software-architecture": true,
     "superpowers@claude-plugins-official": true,
-    "tam-sam-som-calculator@nimble-fox": true,
+    "tam-sam-som-calculator@nimble-fox": false,
     "time-panel@sundial-local": true,
-    "user-story-mapping@nimble-fox": true,
-    "user-story-splitting@nimble-fox": true,
-    "user-story@nimble-fox": true,
-    "voice-of-customer-miner@nimble-fox": true
+    "user-story-mapping@nimble-fox": false,
+    "user-story-splitting@nimble-fox": false,
+    "user-story@nimble-fox": false,
+    "voice-of-customer-miner@nimble-fox": false
   },
   "env": {
     "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1",
@@ -175,7 +175,7 @@
     },
     "sundial-local": {
       "source": {
-        "path": "/home/novusedge/Projects/sundial/mods",
+        "path": "@HOME@/Projects/sundial/mods",
         "source": "directory"
       }
     }
@@ -194,12 +194,24 @@
       {
         "hooks": [
           {
-            "command": "bash '/home/novusedge/.claude/hooks/herdr-agent-state.sh' session",
+            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
             "timeout": 10,
             "type": "command"
           }
         ],
         "matcher": "^(startup|resume|clear|compact|fork)$"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "python3 \"$HOME/.claude/hooks/skill-nudge.py\"",
+            "timeout": 5,
+            "type": "command"
+          }
+        ],
+        "matcher": "^(Edit|Write|MultiEdit|Bash)$"
       }
     ]
   },
@@ -343,7 +355,7 @@
   "remoteControlAtStartup": true,
   "skipWorkflowUsageWarning": true,
   "statusLine": {
-    "command": "sh '/home/novusedge/.claude/glowup/statusline.sh'",
+    "command": "sh \"$HOME/.claude/glowup/statusline.sh\"",
     "refreshInterval": 30,
     "type": "command"
   },

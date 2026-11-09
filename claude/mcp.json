@@ -1,0 +1,28 @@
+{
+  "cabin": {
+    "type": "http",
+    "url": "https://withcabin.com/mcp"
+  },
+  "chrome-devtools": {
+    "args": [
+      "chrome-devtools-mcp@latest",
+      "--categoryExtensions=true",
+      "--executablePath=/usr/bin/chromium",
+      "--chromeArg=--enable-features=BrowsingTopics,PrivacySandboxAdsAPIs,BrowsingTopicsParameters:number_of_epochs_to_expose/3"
+    ],
+    "command": "npx",
+    "env": {},
+    "type": "stdio"
+  },
+  "linear-nimblefox": {
+    "type": "http",
+    "url": "https://mcp.linear.app/mcp"
+  },
+  "stoat": {
+    "args": [
+      "mcp"
+    ],
+    "command": "@HOME@/.local/bin/stoat",
+    "cwd": "@HOME@/vms/stoat"
+  }
+}
