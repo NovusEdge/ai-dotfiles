@@ -95,6 +95,12 @@
         "source": "github"
       }
     },
+    "claude-plugins-official": {
+      "source": {
+        "repo": "anthropics/claude-plugins-official",
+        "source": "github"
+      }
+    },
     "cloudflare": {
       "source": {
         "repo": "cloudflare/skills",

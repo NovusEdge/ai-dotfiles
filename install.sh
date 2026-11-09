@@ -81,6 +81,7 @@ else
   jq -r '.enabledPlugins | to_entries[] | select(.value) | .key' "$want" |
   while read -r p; do
     [ -f "$installed" ] && jq -e --arg p "$p" '.plugins | has($p)' "$installed" >/dev/null && continue
+    jq -e --arg m "${p#*@}" 'has($m)' "$known" >/dev/null 2>&1 || { echo "SKIP  plugin $p: marketplace not added" >&2; continue; }
     cl plugin install "$p" && echo "plug  $p" || echo "FAIL  plugin $p" >&2
   done
 
