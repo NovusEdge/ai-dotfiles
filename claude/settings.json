@@ -1,8 +1,234 @@
 {
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
+  "agentPushNotifEnabled": true,
+  "alwaysThinkingEnabled": true,
+  "autoCompactEnabled": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Any docket work: running docket commands, and reading, editing, rebasing or committing .docket/ ledger and feature files in any repository",
+      "Merging your own PRs in an order that's relevant and doesn't break or lose progress"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: botspot-org (bot.spot). GitHub org `botspot-org`, private repositories",
+      "**Cloud provider(s)**: GCP, single project `bot-backends`. Regions `europe-north1` (Cloud Run, Cloud SQL, GCE data disks) and `europe-west4` (Dagster VM, GPU inference)",
+      "**Repository visibility**: Private — every `botspot-org` repository. The one public repo is the personal `NovusEdge/NovusEdge.github.io`, unrelated to this work",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: Google Secret Manager in `bot-backends`, named `locus-{environment}-{name}`. Terraform owns the containers and never the values (`manage_secret_versions = false`); values are pushed with `scripts/secrets/cli.py push`. Reading, disabling, enabling and deleting these secrets is routine operational work for this user",
+      "**Default / protected branches**: `main` is the default everywhere. No branch protection or environment protection rules exist on any repository, verified 2026-09-13 — `main` and `staging` are unprotected in practice",
+      "**CI/CD deploy targets**: GitHub Actions is the standard path. locus-core: push to `staging` deploys staging; a `v*` tag on `main` deploys production. locus-models: push to `staging` migrates the staging database; the manual `migrate-production.yml` workflow_dispatch migrates production. locus-connectors: push to `staging` deploys staging. Dispatching these workflows, including the production ones, is this user's normal release procedure",
+      "**Network posture**: Cloud Run services are public for customer traffic; data stores sit on private VPCs reached through IAP tunnels. Both Cloud SQL instances require TLS (`ENCRYPTED_ONLY`)",
+      "**Source control**: The four `botspot-org` repositories below and their `origin` remotes on github.com",
+      "**Trusted internal domains**: `bot.spot` and its subdomains, `*.run.app` services under `bot-backends`, `botspot.run`",
+      "**Trusted cloud buckets**: `botspot-widget-{env}` and the terraform state buckets in `bot-backends`",
+      "**Key internal services**: `locus-{env}-api`, `locus-{env}-connectors`, `locus-{env}-mcp` on Cloud Run; `locus-{env}-dagster-daemon`, `locus-{env}-qdrant`, `locus-{env}-memgraph` on GCE; `locus-gliner` and `locus-nli` shared between environments",
+      "**Internal package registry**: `locus-models` publishes wheels; images live in `europe-north1-docker.pkg.dev/bot-backends/locus-{env}`",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. `.env`, `.env.*` (excluding `.env.example`) and `*.secrets.tfvars` are gitignored — treat as secret-bearing",
+      "**Data retention / declassification**: `auth.audit_logs` 12 months, `connector.sync_logs` 90 days, `oculus.*` 24 months, swept by a Dagster asset",
+      "**Sensitive remote targets**: anything whose name carries `prod` or `production` as a whole word or name segment, and the `locus-production-*` resources specifically",
+      "**Protected deployment namespaces / environments**: production Cloud Run services and the production Cloud SQL instance. Changes there reach customers, so confirm intent, then proceed — this user drives production releases as routine work",
+      "**Protected IaC scopes**: IAM, networking, and anything named `prod` or `production`. Terraform runs through `just tf-foundation {env}` and `just tf-services {env}`; `terraform state rm` and `terraform import` are normal reconciliation tools here",
+      "### User-specific",
+      "**Primary use of Claude Code**: general software engineering across work and personal projects: application code, infrastructure, tooling, docs sites, releases, and demo media. No single project is the main one",
+      "**Trusted repos**: `/home/novusedge/Projects/BotDot/locus-core`, `locus-models`, `locus-connectors`, and `botspot-docs`, all on `github.com/botspot-org`. Also present and read-only: `bot.dashboard`, which belongs to another team and must never be modified",
+      "**Personal repos**: any repo under `/home/novusedge/Projects/` whose `origin` is `github.com/NovusEdge/*` is the user's own and trusted, including pushing and publishing releases",
+      "**Visual testing**: starting a throwaway Claude Code session in tmux inside the session scratchpad, typing into it, capturing the pane and recording it is routine UI testing of tools the user builds",
+      "**Org-specific CLIs**: `just` (the recipe runner for every repo), `gcloud`, `gh`, `terraform`, `uv`, and `scripts/secrets/cli.py`"
+    ]
   },
+  "cleanupPeriodDays": 60,
+  "crossSessionInbound": "accept",
+  "effortLevel": "low",
+  "enabledPlugins": {
+    "cloudflare@cloudflare": true,
+    "competitive-analysis-process@nimble-fox": true,
+    "competitive-research-snapshot@nimble-fox": true,
+    "curt@curt": true,
+    "derisk-measurement-advisor@nimble-fox": true,
+    "discovery-interview-prep@nimble-fox": true,
+    "docket@NovusEdge": true,
+    "drygate@drygate": true,
+    "finance-based-pricing-advisor@nimble-fox": true,
+    "frontend-design-pro@frontend-design-pro": false,
+    "frontend-design@claude-code-plugins": false,
+    "frontend-design@claude-plugins-official": false,
+    "glowup@glowup": true,
+    "gopls-lsp@claude-plugins-official": false,
+    "impeccable@impeccable": true,
+    "jobs-to-be-done@nimble-fox": true,
+    "motion-lab@motion-lab": true,
+    "opportunity-solution-tree@nimble-fox": true,
+    "pm-skills@nimble-fox": true,
+    "polished-artifacts@polished-artifacts": true,
+    "ponytail@ponytail": true,
+    "positioning-statement@nimble-fox": true,
+    "prd-development@nimble-fox": true,
+    "press-release@nimble-fox": true,
+    "pricing-packaging-tracker@nimble-fox": true,
+    "prioritization-advisor@nimble-fox": true,
+    "problem-statement@nimble-fox": true,
+    "proto-persona@nimble-fox": true,
+    "readable-responses@readable-responses": true,
+    "roadmap-planning@nimble-fox": true,
+    "rust-analyzer-lsp@claude-plugins-official": false,
+    "saas-economics-efficiency-metrics@nimble-fox": true,
+    "software-architecture@software-architecture": true,
+    "superpowers@claude-plugins-official": true,
+    "tam-sam-som-calculator@nimble-fox": true,
+    "time-panel@sundial-local": true,
+    "user-story-mapping@nimble-fox": true,
+    "user-story-splitting@nimble-fox": true,
+    "user-story@nimble-fox": true,
+    "voice-of-customer-miner@nimble-fox": true
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION": "1000",
+    "DISABLE_AUTOUPDATER": "1",
+    "DOCKET_HOOKS": "off"
+  },
+  "extraKnownMarketplaces": {
+    "NovusEdge": {
+      "source": {
+        "repo": "NovusEdge/docket",
+        "source": "github"
+      }
+    },
+    "cloudflare": {
+      "source": {
+        "repo": "cloudflare/skills",
+        "source": "github"
+      }
+    },
+    "curt": {
+      "source": {
+        "repo": "NovusEdge/curt",
+        "source": "github"
+      }
+    },
+    "drygate": {
+      "source": {
+        "repo": "NovusEdge/drygate",
+        "source": "github"
+      }
+    },
+    "glowup": {
+      "source": {
+        "repo": "NovusEdge/glowup",
+        "source": "github"
+      }
+    },
+    "impeccable": {
+      "source": {
+        "repo": "pbakaus/impeccable",
+        "source": "github"
+      }
+    },
+    "motion-lab": {
+      "source": {
+        "repo": "NovusEdge/motion-lab",
+        "source": "github"
+      }
+    },
+    "nimble-fox": {
+      "source": {
+        "repo": "nimble-fox-ai/agent-plugins",
+        "source": "github"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "repo": "openai/codex-plugin-cc",
+        "source": "github"
+      }
+    },
+    "pm-skills": {
+      "source": {
+        "repo": "deanpeters/Product-Manager-Skills",
+        "source": "github"
+      }
+    },
+    "polished-artifacts": {
+      "source": {
+        "repo": "NovusEdge/polished-artifacts",
+        "source": "github"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "repo": "DietrichGebert/ponytail",
+        "source": "github"
+      }
+    },
+    "readable-responses": {
+      "source": {
+        "repo": "NovusEdge/readable-responses",
+        "source": "github"
+      }
+    },
+    "software-architecture": {
+      "source": {
+        "repo": "NovusEdge/software-architecture",
+        "source": "github"
+      }
+    },
+    "sundial-local": {
+      "source": {
+        "path": "/home/novusedge/Projects/sundial/mods",
+        "source": "directory"
+      }
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "python3 \"$HOME/.claude/hooks/handoff.py\"",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "bash '/home/novusedge/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "^(startup|resume|clear|compact|fork)$"
+      }
+    ]
+  },
+  "inputNeededNotifEnabled": true,
+  "model": "opus",
+  "modelSettings": {
+    "claude-fable-5": {
+      "effortLevel": "medium"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    },
+    "claude-mythos-5-1": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-4-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-4-8": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "outputStyle": "Plain",
   "permissions": {
     "allow": [
       "Bash(wc:*)",
@@ -92,162 +318,42 @@
       "WebFetch(domain:skywork.ai)",
       "WebFetch(domain:evli-website.files.svdcdn.com)"
     ],
+    "defaultMode": "auto",
     "deny": [
       "Bash(sed:*)"
-    ],
-    "defaultMode": "auto"
-  },
-  "model": "opus",
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/handoff.py\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/docket-guard-ledger.py\"",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y ccstatusline@latest",
-    "padding": 0
-  },
-  "enabledPlugins": {
-    "frontend-design-pro@frontend-design-pro": false,
-    "frontend-design@claude-code-plugins": false,
-    "frontend-design@claude-plugins-official": false,
-    "gopls-lsp@claude-plugins-official": false,
-    "ponytail@ponytail": true,
-    "rust-analyzer-lsp@claude-plugins-official": false,
-    "superpowers@claude-plugins-official": true,
-    "curt@curt": true,
-    "docket@NovusEdge": true,
-    "readable-responses@readable-responses": true,
-    "impeccable@impeccable": true,
-    "polished-artifacts@polished-artifacts": true
-  },
-  "extraKnownMarketplaces": {
-    "impeccable": {
-      "source": {
-        "source": "github",
-        "repo": "pbakaus/impeccable"
+  "pluginConfigs": {
+    "glowup@glowup": {
+      "options": {
+        "bubbles": "on",
+        "pack": "arcade",
+        "pet": "clawd",
+        "reducedMotion": false,
+        "spinner": "orb-states",
+        "statusline": "activity, ctx, 5h, week, cost, model, agents, plan, branch, changes, cwd",
+        "theme": "vaporwave"
       }
-    },
-    "ponytail": {
-      "source": {
-        "source": "github",
-        "repo": "DietrichGebert/ponytail"
-      }
-    },
-    "curt": {
-      "source": {
-        "source": "github",
-        "repo": "NovusEdge/curt"
-      }
-    },
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    },
-    "NovusEdge": {
-      "source": {
-        "source": "github",
-        "repo": "NovusEdge/docket"
-      }
-    },
-    "readable-responses": {
-      "source": {
-        "source": "github",
-        "repo": "NovusEdge/readable-responses"
-      }
-    },
-    "polished-artifacts": {
-      "source": {
-        "source": "github",
-        "repo": "NovusEdge/polished-artifacts"
-      }
-    }
-  },
-  "outputStyle": "Plain",
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "low",
-  "modelSettings": {
-    "claude-opus-5": {
-      "effortLevel": "medium"
-    },
-    "claude-opus-4-8": {
-      "effortLevel": "medium"
-    },
-    "claude-opus-4-5": {
-      "effortLevel": "medium"
-    },
-    "claude-fable-5": {
-      "effortLevel": "high"
-    },
-    "claude-fable-5-1": {
-      "effortLevel": "high"
-    },
-    "claude-opus-5-5": {
-      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
+  "remote": {
+    "defaultEnvironmentId": "env_01QTkZBEq2kaXb9VqtG9vMRk"
+  },
+  "remoteControlAtStartup": true,
+  "skipWorkflowUsageWarning": true,
+  "statusLine": {
+    "command": "sh '/home/novusedge/.claude/glowup/statusline.sh'",
+    "refreshInterval": 30,
+    "type": "command"
+  },
+  "switchModelsOnFlag": false,
+  "teammateMode": "auto",
+  "theme": "dark",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"
-  },
-  "skipWorkflowUsageWarning": true,
-  "theme": "dark",
-  "autoCompactEnabled": false,
-  "switchModelsOnFlag": false,
-  "teammateMode": "auto",
-  "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "autoMode": {
-    "environment": [
-      "### Org-wide",
-      "**Organization**: botspot-org (bot.spot). GitHub org `botspot-org`, private repositories",
-      "**Cloud provider(s)**: GCP, single project `bot-backends`. Regions `europe-north1` (Cloud Run, Cloud SQL, GCE data disks) and `europe-west4` (Dagster VM, GPU inference)",
-      "**Repository visibility**: Private — every `botspot-org` repository. The one public repo is the personal `NovusEdge/NovusEdge.github.io`, unrelated to this work",
-      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
-      "**Secrets management**: Google Secret Manager in `bot-backends`, named `locus-{environment}-{name}`. Terraform owns the containers and never the values (`manage_secret_versions = false`); values are pushed with `scripts/secrets/cli.py push`. Reading, disabling, enabling and deleting these secrets is routine operational work for this user",
-      "**Default / protected branches**: `main` is the default everywhere. No branch protection or environment protection rules exist on any repository, verified 2026-09-13 — `main` and `staging` are unprotected in practice",
-      "**CI/CD deploy targets**: GitHub Actions is the standard path. locus-core: push to `staging` deploys staging; a `v*` tag on `main` deploys production. locus-models: push to `staging` migrates the staging database; the manual `migrate-production.yml` workflow_dispatch migrates production. locus-connectors: push to `staging` deploys staging. Dispatching these workflows, including the production ones, is this user's normal release procedure",
-      "**Network posture**: Cloud Run services are public for customer traffic; data stores sit on private VPCs reached through IAP tunnels. Both Cloud SQL instances require TLS (`ENCRYPTED_ONLY`)",
-      "**Source control**: The four `botspot-org` repositories below and their `origin` remotes on github.com",
-      "**Trusted internal domains**: `bot.spot` and its subdomains, `*.run.app` services under `bot-backends`, `botspot.run`",
-      "**Trusted cloud buckets**: `botspot-widget-{env}` and the terraform state buckets in `bot-backends`",
-      "**Key internal services**: `locus-{env}-api`, `locus-{env}-connectors`, `locus-{env}-mcp` on Cloud Run; `locus-{env}-dagster-daemon`, `locus-{env}-qdrant`, `locus-{env}-memgraph` on GCE; `locus-gliner` and `locus-nli` shared between environments",
-      "**Internal package registry**: `locus-models` publishes wheels; images live in `europe-north1-docker.pkg.dev/bot-backends/locus-{env}`",
-      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. `.env`, `.env.*` (excluding `.env.example`) and `*.secrets.tfvars` are gitignored — treat as secret-bearing",
-      "**Data retention / declassification**: `auth.audit_logs` 12 months, `connector.sync_logs` 90 days, `oculus.*` 24 months, swept by a Dagster asset",
-      "**Sensitive remote targets**: anything whose name carries `prod` or `production` as a whole word or name segment, and the `locus-production-*` resources specifically",
-      "**Protected deployment namespaces / environments**: production Cloud Run services and the production Cloud SQL instance. Changes there reach customers, so confirm intent, then proceed — this user drives production releases as routine work",
-      "**Protected IaC scopes**: IAM, networking, and anything named `prod` or `production`. Terraform runs through `just tf-foundation {env}` and `just tf-services {env}`; `terraform state rm` and `terraform import` are normal reconciliation tools here",
-      "### User-specific",
-      "**Primary use of Claude Code**: platform engineering on Locus, a source-agnostic semantic enrichment engine. Day-to-day work spans application code, terraform, database migrations, GCP operations, and release management across staging and production",
-      "**Trusted repos**: `/home/novusedge/Projects/BotDot/locus-core`, `locus-models`, `locus-connectors`, and `botspot-docs`, all on `github.com/botspot-org`. Also present and read-only: `bot.dashboard`, which belongs to another team and must never be modified",
-      "**Org-specific CLIs**: `just` (the recipe runner for every repo), `gcloud`, `gh`, `terraform`, `uv`, and `scripts/secrets/cli.py`"
-    ]
   },
   "voiceEnabled": true
 }

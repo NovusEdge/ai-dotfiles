@@ -30,6 +30,78 @@ READERS = re.compile(
     r"md5sum|sha256sum|stat|file|ls|find|diff|cmp|git|python3?\s+-m\s+json\.tool)$"
 )
 
+# Four of the readers write when asked to. `git restore` and `git checkout --`
+# rewrite a tracked ledger from history, `find -delete` removes it, `sort -o`
+# and `uniq in out` write over it. The name alone settles nothing for these, so
+# their arguments decide.
+# add, stage and commit copy the file into the index and object store and leave
+# the working copy alone; committing the ledger with its work is the documented
+# workflow, so asking there trains people to approve the prompt blind.
+GIT_LEAVES_FILE = frozenset(
+    {
+        "add",
+        "blame",
+        "cat-file",
+        "commit",
+        "diff",
+        "grep",
+        "log",
+        "ls-files",
+        "ls-tree",
+        "rev-list",
+        "rev-parse",
+        "show",
+        "shortlog",
+        "stage",
+        "status",
+    }
+)
+
+FIND_WRITE_ACTIONS = frozenset(
+    {"-delete", "-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf"}
+)
+
+
+# Global options that take a separate value. Without these, the value of `git
+# -C path log` reads as the subcommand.
+GIT_VALUE_OPTIONS = frozenset(
+    {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+)
+
+
+def _git_writes(args: list[str]) -> bool:
+    skip = False
+    for arg in args:
+        if skip:
+            skip = False
+            continue
+        if arg in GIT_VALUE_OPTIONS:
+            skip = True
+            continue
+        if arg.startswith("-"):
+            continue
+        return arg not in GIT_LEAVES_FILE
+    return False
+
+
+def _sort_writes(args: list[str]) -> bool:
+    # -o bundles, so `sort -uo FILE` writes FILE. Any short cluster ending in o
+    # counts, which also catches `-ko` at the cost of a prompt nobody minds.
+    return any(re.fullmatch(r"-[A-Za-z]*o", arg) or arg.startswith("--output") for arg in args)
+
+
+def _uniq_writes(args: list[str]) -> bool:
+    # uniq INPUT OUTPUT writes the second operand.
+    return sum(1 for arg in args if not arg.startswith("-")) > 1
+
+
+WRITE_MODES = {
+    "git": _git_writes,
+    "find": lambda args: any(arg in FIND_WRITE_ACTIONS for arg in args),
+    "sort": _sort_writes,
+    "uniq": _uniq_writes,
+}
+
 # The sanctioned path. `docket` alone is the installed name; bin/docket is the
 # checkout. Both validate every record before they append it.
 DOCKET_CLI = re.compile(r"^(?:[^\s;&|]*/)?docket(?:\.py)?$")
@@ -38,11 +110,25 @@ DOCKET_CLI = re.compile(r"^(?:[^\s;&|]*/)?docket(?:\.py)?$")
 OPAQUE = re.compile(
     r"(^|[\s;&|(])(?:python3?|perl|ruby|node|deno|bun|php|osascript|bash|sh|zsh)"
     r"\s+-\w*[ce]\b"
-    r"|<<-?\s*['\"]?\w+"           # heredoc
-    r"|\$\(|`"                      # command substitution
+    r"|<<-?\s*['\"]?\w+"  # heredoc
+    r"|\$\(|`"  # command substitution
     r"|\beval\b|\bexec\b"
     r"|base64\s+(?:-d|--decode)"
 )
+
+# A quoted delimiter makes the body literal: the shell expands nothing in it.
+# Commit tooling passes messages this way, through `-F -` or `-m "$(cat <<'EOF'
+# ...)"`, and a message about ledger work names the ledger and quotes backticks.
+# The body ends at the first line holding only the tag; matching trailing blanks
+# can only end it earlier than the shell does, which leaves more text to check.
+_QUOTED_HEREDOC = (
+    r"<<-?[ \t]*(?P<q>['\"])(?P<tag>\w+)(?P=q)(?P<rest>[^\n]*)\n"
+    r"(?:.*?\n)??[ \t]*(?P=tag)[ \t]*(?=\n|$)"
+)
+CAT_MESSAGE = re.compile(r"\$\(\s*cat\s+" + _QUOTED_HEREDOC + r"\s*\)", re.S)
+HEREDOC_MESSAGE = re.compile(_QUOTED_HEREDOC, re.S)
+
+SEGMENT_SPLIT = re.compile(r"\|\||&&|[;|&\n]")
 
 
 def global_root() -> Path:
@@ -64,6 +150,10 @@ def is_ledger(path: str, cwd: str) -> bool:
     except (OSError, ValueError):
         return False
     name = resolved.name
+    # The directory counts as a target. A command can name the ledger by a
+    # pattern it never spells out, as `find .docket -name 'ledger.jsonl'` does.
+    if name == ".docket":
+        return True
     if not name.endswith(LEDGER_SUFFIXES):
         return False
     if ".docket" in resolved.parts:
@@ -72,6 +162,14 @@ def is_ledger(path: str, cwd: str) -> bool:
         return global_root() in resolved.parents
     except (OSError, ValueError):
         return False
+
+
+def _names_ledger(word: str, cwd: str) -> bool:
+    """Whether a shell word names a ledger, plain or as --flag=path."""
+    if is_ledger(word, cwd):
+        return True
+    _, sep, value = word.partition("=")
+    return bool(sep and value) and is_ledger(value, cwd)
 
 
 def bash_targets_ledger(command: str, cwd: str) -> bool:
@@ -84,24 +182,44 @@ def bash_targets_ledger(command: str, cwd: str) -> bool:
     """
 
     words = re.findall(r"[^\s'\"<>|;&()]+", command)
-    if not any(is_ledger(word, cwd) for word in words):
+    if not any(_names_ledger(word, cwd) for word in words):
         return False
+    command = _drop_git_messages(command)
     if OPAQUE.search(command):
         return True
     if ">" in command:
         return True
-    for segment in re.split(r"\|\||&&|[;|&\n]", command):
-        head = segment.strip().split()
-        while head and ("=" in head[0] and not head[0].startswith("-")):
-            head = head[1:]          # env assignments before the command
+    for segment in SEGMENT_SPLIT.split(command):
+        head = _command_words(segment)
         if not head:
             continue
         name = head[0]
+        writes = WRITE_MODES.get(Path(name).name)
+        if writes and writes(head[1:]):
+            return True
         if DOCKET_CLI.match(name) or READERS.match(name):
             continue
-        if any(is_ledger(word, cwd) for word in head):
+        if any(_names_ledger(word, cwd) for word in head):
             return True
     return False
+
+
+def _command_words(segment: str) -> list[str]:
+    words = segment.strip().split()
+    while words and ("=" in words[0] and not words[0].startswith("-")):
+        words = words[1:]  # env assignments before the command
+    return words
+
+
+def _drop_git_messages(command: str) -> str:
+    """Remove quoted-heredoc commit messages that feed a git command."""
+
+    def feeds_git(match: re.Match[str]) -> bool:
+        words = _command_words(SEGMENT_SPLIT.split(match.string[: match.start()])[-1])
+        return bool(words) and Path(words[0]).name == "git"
+
+    command = CAT_MESSAGE.sub(lambda m: "MESSAGE" if feeds_git(m) else m.group(0), command)
+    return HEREDOC_MESSAGE.sub(lambda m: m.group("rest") if feeds_git(m) else m.group(0), command)
 
 
 def targeted_path(payload: dict) -> str:
@@ -132,20 +250,24 @@ def main() -> int:
     if not target:
         return 0
 
-    json.dump({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "ask",
-            "permissionDecisionReason": (
-                f"This writes {target} directly. A ledger is append-only and is "
-                "validated on every read, so an edit made around the CLI can "
-                "break it. Record with `docket claim`, `docket decision` or "
-                "`docket question`; repair with `docket check` and `docket "
-                "rebase`; convert an old ledger with `docket migrate`. Approve "
-                "only if you mean to edit the file itself."
-            ),
-        }
-    }, sys.stdout)
+    json.dump(
+        {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": (
+                    f"This writes {target} directly. A ledger is append-only and is "
+                    "validated on every read, so an edit made around the CLI can "
+                    "break it. Record with `docket claim`, `docket decision` or "
+                    "`docket question`; fix a recorded field with `docket correct`; "
+                    "repair with `docket check` and `docket "
+                    "rebase`; convert an old ledger with `docket migrate`. Approve "
+                    "only if you mean to edit the file itself."
+                ),
+            }
+        },
+        sys.stdout,
+    )
     return 0
 
 
