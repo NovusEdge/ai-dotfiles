@@ -8,11 +8,16 @@ from `~/.claude`; only the login and account state are kept apart.
 ## Install
 
 ```zsh
-go install github.com/NovusEdge/claude-pick@latest
-echo 'source /path/to/claude-pick/claude.zsh' >> ~/.zshrc
+git clone git@github.com:NovusEdge/claude-pick.git ~/Projects/Personal/claude-pick
+cd ~/Projects/Personal/claude-pick && go install .
+echo 'source ~/Projects/Personal/claude-pick/claude.zsh' >> ~/.zshrc
 ```
 
 It needs zsh, jq, and `~/go/bin` on your PATH.
+
+The repo is private, so `go install github.com/NovusEdge/claude-pick@latest` works
+only with `GOPRIVATE=github.com/NovusEdge/*` set and SSH access to GitHub; cloning
+as above avoids that.
 
 ## Use
 
