@@ -34,7 +34,7 @@ link() {
   echo "link  $dst"
 }
 
-fill_home() { jq --arg h "$HOME" 'walk(if type == "string" then gsub("@HOME@"; $h) else . end)' "$1"; }
+fill_home() { jq -S --arg h "$HOME" 'walk(if type == "string" then gsub("@HOME@"; $h) else . end)' "$1"; }
 
 git -C "$D" submodule update --init --quiet
 
